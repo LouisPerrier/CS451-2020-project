@@ -47,7 +47,7 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
         checkAndDeliver(m);
     }
 
-    public void checkAndDeliver(Message m) {
+    private void checkAndDeliver(Message m) {
         if (ack.containsKey(m) && ack.get(m).size() > nHosts/2 && !delivered.contains(m)) {
             delivered.add(m);
             listener.deliver(m, m.senderId);

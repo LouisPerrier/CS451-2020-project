@@ -1,8 +1,6 @@
 package cs451;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 
 public class Main {
@@ -47,7 +45,24 @@ public class Main {
             }
         }
 
-        myHost.init(parser.hosts());
+        int nbMessages = 0;
+
+        if (parser.hasConfig()) {
+            try {
+                BufferedReader reader = new BufferedReader(new FileReader(new File(parser.config())));
+                String s = reader.readLine();
+                nbMessages = Integer.parseInt(s);
+                reader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (myHost != null) {
+            myHost.init(parser.hosts(), nbMessages);
+        } else {
+            System.out.println("Invalid id");
+        }
 
         System.out.println("Barrier: " + parser.barrierIp() + ":" + parser.barrierPort());
         System.out.println("Signal: " + parser.signalIp() + ":" + parser.signalPort());

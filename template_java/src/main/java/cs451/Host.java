@@ -19,7 +19,10 @@ public class Host {
     private int port = -1;
 
     private ReceiveThread receiveThread;
-    private PerfectLink perfectLink; //tmp
+    //private PerfectLink perfectLink;
+    private UniformReliableBroadcast urb;
+
+    private int nbMessages;
 
     public boolean populate(String idString, String ipString, String portString) {
         try {
@@ -51,13 +54,15 @@ public class Host {
         return true;
     }
 
-    public void init(List<Host> hosts) {
+    public void init(List<Host> hosts, int nbMessages) {
 	    FairLossLink fairlossLink = new FairLossLink(ip, port, hosts);
-        perfectLink = new PerfectLink(fairlossLink);
+        PerfectLink perfectLink = new PerfectLink(fairlossLink);
         BestEffortBroadcast beb = new BestEffortBroadcast(perfectLink, hosts);
-        UniformReliableBroadcast urb = new UniformReliableBroadcast(beb, hosts.size());
+        urb = new UniformReliableBroadcast(beb, hosts.size());
 
         receiveThread = new ReceiveThread(fairlossLink);
+
+        this.nbMessages = nbMessages;
     }
 
     public int getId() {
@@ -74,8 +79,8 @@ public class Host {
 
     public void broadcast() throws InterruptedException {
         receiveThread.start();
-        Thread.sleep(5000);
-        if (id == 1) {
+
+        /*if (id == 1) {
             perfectLink.send(new Message(1, id), "localhost", 11002);
         }
         else if (id == 2) {
@@ -85,6 +90,10 @@ public class Host {
         }
         else if (id == 3) {
             perfectLink.send(new Message(1, id), "localhost", 11002);
+        }*/
+
+        for (int i =1 ; i<=nbMessages ; i++) {
+            urb.broadcast(new Message(i, id));
         }
     }
 
