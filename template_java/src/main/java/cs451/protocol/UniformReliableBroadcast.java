@@ -1,6 +1,7 @@
 package cs451.protocol;
 
 import cs451.Message;
+import cs451.MessageWithId;
 
 import java.util.*;
 
@@ -34,29 +35,27 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
     }
 
     @Override
-    public void deliver(Message m, int srcId) {
-	m.setUuid(null);
+    public void deliver(MessageWithId m, int srcId) {
+        Message message = m.message;
 	//System.out.println("message : " + m.seq + ", sender : " + m.senderId + ", source : " + srcId);
-        if (!ack.containsKey(m)) {
+        if (!ack.containsKey(message)) {
 	    if (ack.size() < 10) {
 	    for (Message m1 : ack.keySet()){
-	        System.out.println("equals is " + m1.equals(m));
+	        System.out.println("equals is " + m1.equals(message));
 		System.out.println("m1 : seq is " + m1.seq + " and id is " + m1.senderId);
-		System.out.println(m1.uuid==null);
-	        System.out.println("m : seq is " + m.seq + " and id is " + m.senderId );
-System.out.println(m.uuid==null);
+	        System.out.println("m : seq is " + message.seq + " and id is " + message.senderId );
 	    }
 	    }
-            ack.put(m, new HashSet<>(srcId));
+            ack.put(message, new HashSet<>(srcId));
         } else {System.out.println("else");
-            ack.get(m).add(srcId);
+            ack.get(message).add(srcId);
         }
 
-        if (!pending.contains(m)) {//System.out.println("if !pending");
-            pending.add(m);
-            beb.broadcast(m);
+        if (!pending.contains(message)) {//System.out.println("if !pending");
+            pending.add(message);
+            beb.broadcast(message);
         }
-        checkAndDeliver(m);
+        checkAndDeliver(message);
 	//System.out.println("size is " + ack.size());
     }
 

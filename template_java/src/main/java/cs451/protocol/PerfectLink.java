@@ -1,6 +1,7 @@
 package cs451.protocol;
 
 import cs451.Message;
+import cs451.MessageWithId;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,7 +11,7 @@ public class PerfectLink extends UnderlyingProtocol implements Listener, Sender 
 
     private FairLossLink fairlossLink;
 
-    private Set<Message> delivered;
+    private Set<MessageWithId> delivered;
 
     public PerfectLink(FairLossLink fairlossLink){
         this.fairlossLink = fairlossLink;
@@ -21,17 +22,15 @@ public class PerfectLink extends UnderlyingProtocol implements Listener, Sender 
 
     @Override
     public void send(Message m, String dstIp, int dstPort) {
-        //m.setUuid(UUID.randomUUID());
-        fairlossLink.send(m, dstIp, dstPort);
+        MessageWithId m1 = new MessageWithId(m, UUID.randomUUID());
+        fairlossLink.send(m1, dstIp, dstPort);
     }
 
     @Override
-    public void deliver(Message m, int srcId) {
-        /*if (!delivered.contains(m)) {
+    public void deliver(MessageWithId m, int srcId) {
+        if (!delivered.contains(m)) {
             delivered.add(m);
-            //m.setUuid(null);
             listener.deliver(m, srcId);
-        }*/
-	listener.deliver(m, srcId); //TODO delete
+        }
     }
 }

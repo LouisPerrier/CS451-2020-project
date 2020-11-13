@@ -2,6 +2,7 @@ package cs451.protocol;
 
 import cs451.Message;
 import cs451.Host;
+import cs451.MessageWithId;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -10,7 +11,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.UUID;
 
-public class FairLossLink extends UnderlyingProtocol implements Sender {
+public class FairLossLink extends UnderlyingProtocol {
 
     private DatagramSocket socket;
     private List<Host> hosts;
@@ -25,13 +26,12 @@ public class FairLossLink extends UnderlyingProtocol implements Sender {
     }
 
 
-    @Override
-    public void send(Message m, String dstIp, int dstPort) {
+    public void send(MessageWithId m, String dstIp, int dstPort) {
 
         ByteBuffer bb = ByteBuffer.allocate(24);
-        bb.putInt(m.seq).putInt(m.senderId);
-        //bb.putLong(m.uuid.getMostSignificantBits());
-        //bb.putLong(m.uuid.getLeastSignificantBits());
+        bb.putInt(m.message.seq).putInt(m.message.senderId);
+        bb.putLong(m.uuid.getMostSignificantBits());
+        bb.putLong(m.uuid.getLeastSignificantBits());
         byte[] buf = bb.array();
 
         try {
@@ -55,11 +55,11 @@ public class FairLossLink extends UnderlyingProtocol implements Sender {
         ByteBuffer bb = ByteBuffer.wrap(packet.getData());
         int seq = bb.getInt();
         int senderId = bb.getInt();
-        //long uuid1 = bb.getLong();
-        //long uuid2 = bb.getLong();
+        long uuid1 = bb.getLong();
+        long uuid2 = bb.getLong();
 
-        Message m = new Message(seq, senderId);
-        //m.setUuid(new UUID(uuid1, uuid2));
+        Message message = new Message(seq, senderId);
+        MessageWithId m = new MessageWithId(message, new UUID(uuid1, uuid2));
 
         int sourceId = 0;
         for (Host h : hosts) {

@@ -2,6 +2,7 @@ package cs451.protocol;
 
 import cs451.Message;
 import cs451.Host;
+import cs451.MessageWithId;
 
 import java.util.List;
 
@@ -24,8 +25,7 @@ public class BestEffortBroadcast extends UnderlyingProtocol implements Broadcast
     }
 
     @Override
-    public void deliver(Message m, int srcId) {
-	//m.setUuid(null); //TODO test
+    public void deliver(MessageWithId m, int srcId) {
         listener.deliver(m, srcId);
     }
 }

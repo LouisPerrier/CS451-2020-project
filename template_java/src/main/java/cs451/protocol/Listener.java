@@ -1,7 +1,8 @@
 package cs451.protocol;
 
 import cs451.Message;
+import cs451.MessageWithId;
 
 public interface Listener {
-    void deliver(Message m, int srcId);
+    void deliver(MessageWithId m, int srcId);
 }
