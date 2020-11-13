@@ -44,6 +44,7 @@ public class Main {
             System.out.println(host.getId() + ", " + host.getIp() + ", " + host.getPort());
             if (host.getId()==myId) {
                 myHost = host;
+		myHost.init();
             }
         }
 

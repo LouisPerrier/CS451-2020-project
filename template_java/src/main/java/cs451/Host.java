@@ -45,13 +45,15 @@ public class Host {
             e.printStackTrace();
         }
 
-        FairlossLink fairlossLink = new FairlossLink(ip, port);
+        return true;
+    }
+
+    public void init() {
+	FairlossLink fairlossLink = new FairlossLink(ip, port);
         perfectLink = new PerfectLink(fairlossLink);
         fairlossLink.addListener(perfectLink);
 
         receiveThread = new ReceiveThread(fairlossLink);
-
-        return true;
     }
 
     public int getId() {
