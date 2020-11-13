@@ -5,7 +5,7 @@ import cs451.MessageWithId;
 
 import java.util.*;
 
-public class UniformReliableBroadcast extends UnderlyingProtocol implements Listener, Broadcaster {
+public class UniformReliableBroadcast extends UnderlyingProtocol implements Listener {
 
     private BestEffortBroadcast beb;
 
@@ -25,10 +25,8 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
         ack = new HashMap<>();
     }
 
-    @Override
     public void broadcast(Message m) {
-	System.out.println("broadcast called");
-	//m.setUuid(UUID.randomUUID()); TODO delete
+
         pending.add(m);
         beb.broadcast(m);
         checkAndDeliver(m);
@@ -37,33 +35,24 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
     @Override
     public void deliver(MessageWithId m, int srcId) {
         Message message = m.message;
-	//System.out.println("message : " + m.seq + ", sender : " + m.senderId + ", source : " + srcId);
+
         if (!ack.containsKey(message)) {
-	    if (ack.size() < 10) {
-	    for (Message m1 : ack.keySet()){
-	        System.out.println("equals is " + m1.equals(message));
-		System.out.println("m1 : seq is " + m1.seq + " and id is " + m1.senderId);
-	        System.out.println("m : seq is " + message.seq + " and id is " + message.senderId );
-	    }
-	    }
             ack.put(message, new HashSet<>(srcId));
-        } else {System.out.println("else");
+        } else {
             ack.get(message).add(srcId);
         }
 
-        if (!pending.contains(message)) {//System.out.println("if !pending");
+        if (!pending.contains(message)) {
             pending.add(message);
             beb.broadcast(message);
         }
         checkAndDeliver(message);
-	//System.out.println("size is " + ack.size());
     }
 
     private void checkAndDeliver(Message m) {
         if (ack.containsKey(m) && ack.get(m).size() > nHosts/2 && !delivered.contains(m)) {
             delivered.add(m);
-            //listener.deliver(m, m.senderId); TODO uncomment
-	    System.out.println("delivered message " + m.seq + "  broadcast by " + m.senderId);
+            //listener.deliver(new MessageWithId(m, null), m.senderId); TODO uncomment
         }
     }
 }

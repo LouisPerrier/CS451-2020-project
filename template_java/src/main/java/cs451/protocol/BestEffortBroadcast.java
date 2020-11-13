@@ -6,7 +6,7 @@ import cs451.MessageWithId;
 
 import java.util.List;
 
-public class BestEffortBroadcast extends UnderlyingProtocol implements Broadcaster, Listener{
+public class BestEffortBroadcast extends UnderlyingProtocol implements Listener{
 
     private PerfectLink perfectLink;
     private List<Host> hosts;
@@ -17,7 +17,6 @@ public class BestEffortBroadcast extends UnderlyingProtocol implements Broadcast
         this.hosts = hosts;
     }
 
-    @Override
     public void broadcast(Message m) {
         for (Host h : hosts) {
             perfectLink.send(m, h.getIp(), h.getPort());

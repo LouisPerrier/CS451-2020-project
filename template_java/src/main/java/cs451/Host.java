@@ -56,7 +56,7 @@ public class Host {
 
     public void init(List<Host> hosts, int nbMessages) {
 	    FairLossLink fairlossLink = new FairLossLink(ip, port, hosts);
-        PerfectLink perfectLink = new PerfectLink(fairlossLink);
+        PerfectLink perfectLink = new PerfectLink(fairlossLink, hosts);
         BestEffortBroadcast beb = new BestEffortBroadcast(perfectLink, hosts);
         urb = new UniformReliableBroadcast(beb, hosts.size());
 
