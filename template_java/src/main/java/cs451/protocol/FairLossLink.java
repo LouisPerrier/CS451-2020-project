@@ -27,7 +27,7 @@ public class FairLossLink extends UnderlyingProtocol implements Sender {
     @Override
     public void send(Message m, String dstIp, int dstPort) {
 
-        ByteBuffer bb = ByteBuffer.allocate(4);
+        ByteBuffer bb = ByteBuffer.allocate(8);
         bb.putInt(m.seq).putInt(m.senderId);
         byte[] buf = bb.array();
 
@@ -41,7 +41,7 @@ public class FairLossLink extends UnderlyingProtocol implements Sender {
     }
 
     public void receive() {
-        byte[] buf = new byte[4];
+        byte[] buf = new byte[8];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         try {
             socket.receive(packet);
