@@ -1,5 +1,6 @@
 package cs451.protocol;
 
+import cs451.Main;
 import cs451.Message;
 import cs451.MessageWithId;
 
@@ -52,6 +53,7 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
         if (ack.containsKey(m) && ack.get(m).size() > nHosts/2 && !delivered.contains(m)) {
             delivered.add(m);
             //listener.deliver(new MessageWithId(m, null), m.senderId); TODO uncomment
+            Main.outputBuffer.add("d " + m.senderId + " " + m.seq);
         }
     }
 }

@@ -94,6 +94,7 @@ public class Host {
 
         for (int i =1 ; i<=nbMessages ; i++) {
             urb.broadcast(new Message(i, id));
+            Main.outputBuffer.add("b " + i);
         }
     }
 

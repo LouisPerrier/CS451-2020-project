@@ -2,8 +2,13 @@ package cs451;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Main {
+
+    private static String outputPath;
+    public static Queue<String> outputBuffer = new LinkedList<>();
 
     private static void handleSignal() {
         //immediately stop network packet processing
@@ -11,6 +16,21 @@ public class Main {
 
         //write/flush output file if necessary
         System.out.println("Writing output.");
+
+        try {
+            File outputFile = new File(outputPath);
+            FileOutputStream s = new FileOutputStream(outputFile);
+            OutputStreamWriter w = new OutputStreamWriter(s);
+            while (outputBuffer.peek() != null) {
+                w.write(outputBuffer.poll());
+                w.write("\n");
+            }
+            w.close();
+            s.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private static void initSignalHandlers() {
@@ -67,6 +87,7 @@ public class Main {
         System.out.println("Barrier: " + parser.barrierIp() + ":" + parser.barrierPort());
         System.out.println("Signal: " + parser.signalIp() + ":" + parser.signalPort());
         System.out.println("Output: " + parser.output());
+        outputPath = parser.output();
         // if config is defined; always check before parser.config()
         if (parser.hasConfig()) {
             System.out.println("Config: " + parser.config());
