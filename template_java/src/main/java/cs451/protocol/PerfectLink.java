@@ -15,7 +15,7 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
     private Map<MessageWithId, AbstractMap.SimpleEntry<String, Integer>> unAcked;
     private Set<MessageWithId> delivered;
 
-    private final long period = 5000;
+    private final long period = 1000;
 
     public PerfectLink(FairLossLink fairLossLink, List<Host> hosts){
         this.fairLossLink = fairLossLink;
