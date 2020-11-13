@@ -1,9 +1,6 @@
 package cs451;
 
-import cs451.protocol.BestEffortBroadcast;
-import cs451.protocol.FairLossLink;
-import cs451.protocol.PerfectLink;
-import cs451.protocol.UniformReliableBroadcast;
+import cs451.protocol.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -19,8 +16,7 @@ public class Host {
     private int port = -1;
 
     private ReceiveThread receiveThread;
-    //private PerfectLink perfectLink;
-    private UniformReliableBroadcast urb;
+    private FifoBroadcast fb;
 
     private int nbMessages;
 
@@ -58,7 +54,8 @@ public class Host {
 	    FairLossLink fairlossLink = new FairLossLink(ip, port, hosts);
         PerfectLink perfectLink = new PerfectLink(fairlossLink, hosts);
         BestEffortBroadcast beb = new BestEffortBroadcast(perfectLink, hosts);
-        urb = new UniformReliableBroadcast(beb, hosts.size());
+        UniformReliableBroadcast urb = new UniformReliableBroadcast(beb, hosts.size());
+        fb = new FifoBroadcast(urb, hosts.size());
 
         receiveThread = new ReceiveThread(fairlossLink);
 
@@ -93,7 +90,7 @@ public class Host {
         }*/
 
         for (int i =1 ; i<=nbMessages ; i++) {
-            urb.broadcast(new Message(i, id));
+            fb.broadcast(new Message(i, id));
             Main.outputBuffer.add("b " + i);
         }
     }
