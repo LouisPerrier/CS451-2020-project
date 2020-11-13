@@ -1,5 +1,7 @@
 package cs451.protocol;
 
+import cs451.DeliveredMessage;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,7 +10,7 @@ public class PerfectLink implements Listener, Sender {
     private Listener listener;
     private FairlossLink fairlossLink;
 
-    private Set<Integer> delivered;
+    private Set<DeliveredMessage> delivered;
 
     public PerfectLink(FairlossLink fairlossLink){
         this.fairlossLink = fairlossLink;
@@ -23,11 +25,11 @@ public class PerfectLink implements Listener, Sender {
     }
 
     @Override
-    public void deliver(Integer seq, String srcIp, int srcPort) {
-        if (!delivered.contains(seq)) {
-            delivered.add(seq);
+    public void deliver(DeliveredMessage m, String srcIp, int srcPort) {
+        if (!delivered.contains(m)) {
+            delivered.add(m);
             //listener.deliver(seq, srcIp, srcPort);
-            System.out.println("Message delivered : " + seq);
+            System.out.println("Message delivered : " + m.seq);
         }
     }
 }

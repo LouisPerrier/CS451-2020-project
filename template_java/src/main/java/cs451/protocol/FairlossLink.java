@@ -1,9 +1,13 @@
 package cs451.protocol;
 
+import cs451.DeliveredMessage;
+import cs451.Host;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.nio.ByteBuffer;
+import java.util.List;
 
 public class FairlossLink extends UnderlyingProtocol implements Sender {
 
@@ -34,7 +38,7 @@ public class FairlossLink extends UnderlyingProtocol implements Sender {
 
     }
 
-    public void receive() {
+    public void receive(List<Host> hosts) {
         byte[] buf = new byte[4];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         try {
@@ -45,8 +49,16 @@ public class FairlossLink extends UnderlyingProtocol implements Sender {
 
         ByteBuffer bb = ByteBuffer.wrap(packet.getData());
         int seq = bb.getInt();
+        int senderId = 0;
 
-        listener.deliver(seq, packet.getAddress().getHostAddress(), packet.getPort());
+        for (Host h : hosts) {
+            if (h.getIp().equals(packet.getAddress().getHostAddress()) && h.getPort() == packet.getPort()) {
+                senderId = h.getId();
+            }
+        }
+
+        DeliveredMessage m = new DeliveredMessage(seq, senderId);
+        listener.deliver(m, packet.getAddress().getHostAddress(), packet.getPort());
     }
 
 }

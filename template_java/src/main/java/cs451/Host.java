@@ -5,6 +5,7 @@ import cs451.protocol.PerfectLink;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 
 public class Host {
@@ -48,12 +49,12 @@ public class Host {
         return true;
     }
 
-    public void init() {
-	FairlossLink fairlossLink = new FairlossLink(ip, port);
+    public void init(List<Host> hosts) {
+	    FairlossLink fairlossLink = new FairlossLink(ip, port);
         perfectLink = new PerfectLink(fairlossLink);
         fairlossLink.addListener(perfectLink);
 
-        receiveThread = new ReceiveThread(fairlossLink);
+        receiveThread = new ReceiveThread(fairlossLink, hosts);
     }
 
     public int getId() {

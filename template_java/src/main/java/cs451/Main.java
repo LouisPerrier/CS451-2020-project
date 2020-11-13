@@ -44,9 +44,10 @@ public class Main {
             System.out.println(host.getId() + ", " + host.getIp() + ", " + host.getPort());
             if (host.getId()==myId && myHost==null) {
                 myHost = host;
-		        myHost.init();
             }
         }
+
+        myHost.init(parser.hosts());
 
         System.out.println("Barrier: " + parser.barrierIp() + ":" + parser.barrierPort());
         System.out.println("Signal: " + parser.signalIp() + ":" + parser.signalPort());
