@@ -66,8 +66,9 @@ public class Host {
         return port;
     }
 
-    public void broadcast() {
+    public void broadcast() throws InterruptedException {
         receiveThread.start();
+        Thread.sleep(5000);
         if (id == 1)
             perfectLink.send(1, "localhost", 11002);
         else
