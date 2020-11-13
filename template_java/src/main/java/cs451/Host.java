@@ -76,10 +76,13 @@ public class Host {
             perfectLink.send(1, "localhost", 11002);
             perfectLink.send(1, "localhost", 11002);
         }
-        else {
+        else if (id == 2) {
             perfectLink.send(1, "localhost", 11001);
             perfectLink.send(2, "localhost", 11001);
             perfectLink.send(3, "localhost", 11001);
+        }
+        else if (id == 3) {
+            perfectLink.send(1, "localhost", 11002);
         }
     }
 
