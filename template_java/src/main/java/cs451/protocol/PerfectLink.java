@@ -29,7 +29,7 @@ public class PerfectLink extends UnderlyingProtocol implements Listener, Sender 
     public void deliver(Message m, int srcId) {
         if (!delivered.contains(m)) {
             delivered.add(m);
-            m.setUuid(null);
+            //m.setUuid(null);
             listener.deliver(m, srcId);
         }
     }

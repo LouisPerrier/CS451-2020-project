@@ -24,10 +24,12 @@ public class Message {
 
         Message m = (Message) o;
 
-        if (m.uuid == null && this.uuid == null)
+        if (m.uuid == null && this.uuid == null) {
+	    System.out.println("both null");
             return this.seq == m.seq && this.senderId == m.senderId;
-        else if (m.uuid != null && this.uuid != null)
-            return this.uuid == m.uuid;
+        } else if (m.uuid != null && this.uuid != null) {
+            return this.uuid.equals(m.uuid);
+	}
         else
             return false;
     }

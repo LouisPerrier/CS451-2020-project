@@ -26,6 +26,7 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
 
     @Override
     public void broadcast(Message m) {
+	System.out.println("broadcast called");
         pending.add(m);
         beb.broadcast(m);
         checkAndDeliver(m);
@@ -33,24 +34,31 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
 
     @Override
     public void deliver(Message m, int srcId) {
-
+	//System.out.println("message : " + m.seq + ", sender : " + m.senderId + ", source : " + srcId);
         if (!ack.containsKey(m)) {
+	    if (ack.size() < 10) {
+	    for (Message m1 : ack.keySet()){
+	        System.out.println("equals is " + m1.equals(m));
+	    }
+	    }
             ack.put(m, new HashSet<>(srcId));
-        } else {
+        } else {System.out.println("else");
             ack.get(m).add(srcId);
         }
 
-        if (!pending.contains(m)) {
+        if (!pending.contains(m)) {//System.out.println("if !pending");
             pending.add(m);
             beb.broadcast(m);
         }
         checkAndDeliver(m);
+	//System.out.println("size is " + ack.size());
     }
 
     private void checkAndDeliver(Message m) {
         if (ack.containsKey(m) && ack.get(m).size() > nHosts/2 && !delivered.contains(m)) {
             delivered.add(m);
-            listener.deliver(m, m.senderId);
+            //listener.deliver(m, m.senderId); TODO uncomment
+	    System.out.println("delivered message " + m.seq + "  broadcast by " + m.senderId);
         }
     }
 }
