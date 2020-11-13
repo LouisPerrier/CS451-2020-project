@@ -71,10 +71,16 @@ public class Host {
     public void broadcast() throws InterruptedException {
         receiveThread.start();
         Thread.sleep(5000);
-        if (id == 1)
+        if (id == 1) {
             perfectLink.send(1, "localhost", 11002);
-        else
+            perfectLink.send(1, "localhost", 11002);
+            perfectLink.send(1, "localhost", 11002);
+        }
+        else {
             perfectLink.send(1, "localhost", 11001);
+            perfectLink.send(2, "localhost", 11001);
+            perfectLink.send(3, "localhost", 11001);
+        }
     }
 
 }

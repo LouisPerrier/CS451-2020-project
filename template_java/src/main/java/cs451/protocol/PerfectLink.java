@@ -27,6 +27,7 @@ public class PerfectLink implements Listener, Sender {
         if (!delivered.contains(seq)) {
             delivered.add(seq);
             //listener.deliver(seq, srcIp, srcPort);
+            System.out.println("Message delivered : " + seq);
         }
     }
 }

@@ -13,8 +13,7 @@ public class ReceiveThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            int seq = fairlossLink.receive();
-            System.out.println("message received : " + seq);
+            fairlossLink.receive();
         }
     }
 }

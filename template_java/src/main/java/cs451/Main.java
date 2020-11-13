@@ -42,9 +42,9 @@ public class Main {
         System.out.println("List of hosts is:");
         for (Host host: parser.hosts()) {
             System.out.println(host.getId() + ", " + host.getIp() + ", " + host.getPort());
-            if (host.getId()==myId) {
+            if (host.getId()==myId && myHost==null) {
                 myHost = host;
-		myHost.init();
+		        myHost.init();
             }
         }
 

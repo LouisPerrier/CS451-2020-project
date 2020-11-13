@@ -34,7 +34,7 @@ public class FairlossLink extends UnderlyingProtocol implements Sender {
 
     }
 
-    public int receive() {
+    public void receive() {
         byte[] buf = new byte[4];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         try {
@@ -47,8 +47,6 @@ public class FairlossLink extends UnderlyingProtocol implements Sender {
         int seq = bb.getInt();
 
         listener.deliver(seq, packet.getAddress().getHostAddress(), packet.getPort());
-
-        return seq;
     }
 
 }
