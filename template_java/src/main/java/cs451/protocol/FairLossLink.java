@@ -30,8 +30,8 @@ public class FairLossLink extends UnderlyingProtocol implements Sender {
 
         ByteBuffer bb = ByteBuffer.allocate(24);
         bb.putInt(m.seq).putInt(m.senderId);
-        bb.putLong(m.uuid.getMostSignificantBits());
-        bb.putLong(m.uuid.getLeastSignificantBits());
+        //bb.putLong(m.uuid.getMostSignificantBits());
+        //bb.putLong(m.uuid.getLeastSignificantBits());
         byte[] buf = bb.array();
 
         try {
@@ -55,11 +55,11 @@ public class FairLossLink extends UnderlyingProtocol implements Sender {
         ByteBuffer bb = ByteBuffer.wrap(packet.getData());
         int seq = bb.getInt();
         int senderId = bb.getInt();
-        long uuid1 = bb.getLong();
-        long uuid2 = bb.getLong();
+        //long uuid1 = bb.getLong();
+        //long uuid2 = bb.getLong();
 
         Message m = new Message(seq, senderId);
-        m.setUuid(new UUID(uuid1, uuid2));
+        //m.setUuid(new UUID(uuid1, uuid2));
 
         int sourceId = 0;
         for (Host h : hosts) {

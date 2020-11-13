@@ -27,6 +27,7 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
     @Override
     public void broadcast(Message m) {
 	System.out.println("broadcast called");
+	//m.setUuid(UUID.randomUUID()); TODO delete
         pending.add(m);
         beb.broadcast(m);
         checkAndDeliver(m);
@@ -34,11 +35,16 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
 
     @Override
     public void deliver(Message m, int srcId) {
+	m.setUuid(null);
 	//System.out.println("message : " + m.seq + ", sender : " + m.senderId + ", source : " + srcId);
         if (!ack.containsKey(m)) {
 	    if (ack.size() < 10) {
 	    for (Message m1 : ack.keySet()){
 	        System.out.println("equals is " + m1.equals(m));
+		System.out.println("m1 : seq is " + m1.seq + " and id is " + m1.senderId);
+		System.out.println(m1.uuid==null);
+	        System.out.println("m : seq is " + m.seq + " and id is " + m.senderId );
+System.out.println(m.uuid==null);
 	    }
 	    }
             ack.put(m, new HashSet<>(srcId));

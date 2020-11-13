@@ -25,8 +25,7 @@ public class BestEffortBroadcast extends UnderlyingProtocol implements Broadcast
 
     @Override
     public void deliver(Message m, int srcId) {
-	System.out.println("reached");
-	m.setUuid(null); //TODO test
+	//m.setUuid(null); //TODO test
         listener.deliver(m, srcId);
     }
 }
