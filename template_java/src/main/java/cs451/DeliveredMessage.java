@@ -17,4 +17,9 @@ public class DeliveredMessage {
         DeliveredMessage m = (DeliveredMessage) o;
         return this.seq == m.seq && this.senderId == m.senderId;
     }
+
+    @Override
+    public int hashCode() {
+	return seq;
+    }
 }
