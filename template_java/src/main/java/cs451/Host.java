@@ -1,7 +1,11 @@
 package cs451;
 
+import cs451.protocol.FairlossLink;
+import cs451.protocol.PerfectLink;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+
 
 public class Host {
 
@@ -10,6 +14,9 @@ public class Host {
     private int id;
     private String ip;
     private int port = -1;
+
+    private ReceiveThread receiveThread;
+    private PerfectLink perfectLink; //tmp
 
     public boolean populate(String idString, String ipString, String portString) {
         try {
@@ -38,6 +45,12 @@ public class Host {
             e.printStackTrace();
         }
 
+        FairlossLink fairlossLink = new FairlossLink(ip, port);
+        perfectLink = new PerfectLink(fairlossLink);
+        fairlossLink.addListener(perfectLink);
+
+        receiveThread = new ReceiveThread(fairlossLink);
+
         return true;
     }
 
@@ -51,6 +64,14 @@ public class Host {
 
     public int getPort() {
         return port;
+    }
+
+    public void broadcast() {
+        receiveThread.start();
+        if (id == 1)
+            perfectLink.send(1, "localhost", 11002);
+        else
+            perfectLink.send(1, "localhost", 11001);
     }
 
 }

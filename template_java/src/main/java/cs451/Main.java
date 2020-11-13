@@ -35,10 +35,16 @@ public class Main {
         System.out.println("My PID is " + pid + ".");
         System.out.println("Use 'kill -SIGINT " + pid + " ' or 'kill -SIGTERM " + pid + " ' to stop processing packets.");
 
-        System.out.println("My id is " + parser.myId() + ".");
+        int myId = parser.myId();
+        System.out.println("My id is " + myId + ".");
+
+        Host myHost = null;
         System.out.println("List of hosts is:");
         for (Host host: parser.hosts()) {
             System.out.println(host.getId() + ", " + host.getIp() + ", " + host.getPort());
+            if (host.getId()==myId) {
+                myHost = host;
+            }
         }
 
         System.out.println("Barrier: " + parser.barrierIp() + ":" + parser.barrierPort());
@@ -56,6 +62,8 @@ public class Main {
         coordinator.waitOnBarrier();
 
 	System.out.println("Broadcasting messages...");
+
+	if (myHost != null) myHost.broadcast();
 
 	System.out.println("Signaling end of broadcasting messages");
         coordinator.finishedBroadcasting();
