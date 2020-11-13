@@ -15,7 +15,7 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
     private Map<MessageWithId, AbstractMap.SimpleEntry<String, Integer>> unAcked;
     private Set<MessageWithId> delivered;
 
-    private final long period = 500;
+    private final long period = 5000;
 
     public PerfectLink(FairLossLink fairLossLink, List<Host> hosts){
         this.fairLossLink = fairLossLink;
@@ -44,9 +44,7 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
 
     @Override
     public void deliver(MessageWithId m, int srcId) {
-
-        if (delivered.contains(m)) {
-            String srcIp = "";
+/*String srcIp = "";
             int srcPort = 0;
             for (Host h : hosts) {
                 if (h.getId() == srcId) {
@@ -54,12 +52,20 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
                     srcPort = h.getPort();
                 }
             }
+        if (delivered.contains(m)) {
+            
             fairLossLink.send(m, srcIp, srcPort); //send ack
         } else if (unAcked.containsKey(m)) {
             unAcked.remove(m);
         } else {
+fairLossLink.send(m, srcIp, srcPort); //send ack
             delivered.add(m);
             listener.deliver(m, srcId);
-        }
+        }*/
+
+	if (!delivered.contains(m)) {
+		delivered.add(m);
+            listener.deliver(m, srcId);
+}
     }
 }

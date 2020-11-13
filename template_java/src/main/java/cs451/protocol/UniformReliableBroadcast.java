@@ -35,7 +35,6 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
     @Override
     public void deliver(MessageWithId m, int srcId) {
         Message message = m.message;
-
         if (!ack.containsKey(message)) {
             ack.put(message, new HashSet<>(srcId));
         } else {
