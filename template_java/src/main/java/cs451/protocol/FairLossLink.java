@@ -1,6 +1,6 @@
 package cs451.protocol;
 
-import cs451.DeliveredMessage;
+import cs451.Message;
 import cs451.Host;
 
 import java.net.DatagramPacket;
@@ -9,24 +9,26 @@ import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.List;
 
-public class FairlossLink extends UnderlyingProtocol implements Sender {
+public class FairLossLink extends UnderlyingProtocol implements Sender {
 
     private DatagramSocket socket;
+    private List<Host> hosts;
 
-    public FairlossLink(String ip, int port) {
+    public FairLossLink(String ip, int port, List<Host> hosts) {
         try {
             this.socket = new DatagramSocket(port, InetAddress.getByName(ip));
         } catch (Exception e) {
             e.printStackTrace();
         }
+        this.hosts = hosts;
     }
 
 
     @Override
-    public void send(Integer seq, String dstIp, int dstPort) {
+    public void send(Message m, String dstIp, int dstPort) {
 
         ByteBuffer bb = ByteBuffer.allocate(4);
-        bb.putInt(seq);
+        bb.putInt(m.seq).putInt(m.senderId);
         byte[] buf = bb.array();
 
         try {
@@ -38,7 +40,7 @@ public class FairlossLink extends UnderlyingProtocol implements Sender {
 
     }
 
-    public void receive(List<Host> hosts) {
+    public void receive() {
         byte[] buf = new byte[4];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         try {
@@ -49,16 +51,18 @@ public class FairlossLink extends UnderlyingProtocol implements Sender {
 
         ByteBuffer bb = ByteBuffer.wrap(packet.getData());
         int seq = bb.getInt();
-        int senderId = 0;
+        int senderId = bb.getInt();
 
+        Message m = new Message(seq, senderId);
+
+        int sourceId = 0;
         for (Host h : hosts) {
             if (h.getIp().equals(packet.getAddress().getHostAddress()) && h.getPort() == packet.getPort()) {
-                senderId = h.getId();
+                sourceId = h.getId();
             }
         }
 
-        DeliveredMessage m = new DeliveredMessage(seq, senderId);
-        listener.deliver(m, packet.getAddress().getHostAddress(), packet.getPort());
+        listener.deliver(m, sourceId);
     }
 
 }

@@ -1,10 +1,10 @@
 package cs451;
 
-public class DeliveredMessage {
+public class Message {
     public int seq;
     public int senderId;
 
-    public DeliveredMessage(int seq, int senderId) {
+    public Message(int seq, int senderId) {
         this.seq = seq;
         this.senderId = senderId;
     }
@@ -12,9 +12,9 @@ public class DeliveredMessage {
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
-        if (! (o instanceof DeliveredMessage)) return false;
+        if (! (o instanceof Message)) return false;
 
-        DeliveredMessage m = (DeliveredMessage) o;
+        Message m = (Message) o;
         return this.seq == m.seq && this.senderId == m.senderId;
     }
 

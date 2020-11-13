@@ -1,7 +1,9 @@
 package cs451;
 
-import cs451.protocol.FairlossLink;
+import cs451.protocol.BestEffortBroadcast;
+import cs451.protocol.FairLossLink;
 import cs451.protocol.PerfectLink;
+import cs451.protocol.UniformReliableBroadcast;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -50,11 +52,12 @@ public class Host {
     }
 
     public void init(List<Host> hosts) {
-	    FairlossLink fairlossLink = new FairlossLink(ip, port);
+	    FairLossLink fairlossLink = new FairLossLink(ip, port, hosts);
         perfectLink = new PerfectLink(fairlossLink);
-        fairlossLink.addListener(perfectLink);
+        BestEffortBroadcast beb = new BestEffortBroadcast(perfectLink, hosts);
+        UniformReliableBroadcast urb = new UniformReliableBroadcast(beb, hosts.size());
 
-        receiveThread = new ReceiveThread(fairlossLink, hosts);
+        receiveThread = new ReceiveThread(fairlossLink);
     }
 
     public int getId() {
@@ -73,17 +76,15 @@ public class Host {
         receiveThread.start();
         Thread.sleep(5000);
         if (id == 1) {
-            perfectLink.send(1, "localhost", 11002);
-            perfectLink.send(1, "localhost", 11002);
-            perfectLink.send(1, "localhost", 11002);
+            perfectLink.send(new Message(1, id), "localhost", 11002);
         }
         else if (id == 2) {
-            perfectLink.send(1, "localhost", 11001);
-            perfectLink.send(2, "localhost", 11001);
-            perfectLink.send(3, "localhost", 11001);
+            perfectLink.send(new Message(1, id), "localhost", 11001);
+            perfectLink.send(new Message(2, id), "localhost", 11001);
+            perfectLink.send(new Message(3, id), "localhost", 11001);
         }
         else if (id == 3) {
-            perfectLink.send(1, "localhost", 11002);
+            perfectLink.send(new Message(1, id), "localhost", 11002);
         }
     }
 

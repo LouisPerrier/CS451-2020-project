@@ -1,23 +1,19 @@
 package cs451;
 
-import cs451.protocol.FairlossLink;
-
-import java.util.List;
+import cs451.protocol.FairLossLink;
 
 public class ReceiveThread extends Thread {
 
-    private FairlossLink fairlossLink;
-    private List<Host> hosts;
+    private FairLossLink fairlossLink;
 
-    public ReceiveThread(FairlossLink fairlossLink, List<Host> hosts) {
+    public ReceiveThread(FairLossLink fairlossLink) {
         this.fairlossLink = fairlossLink;
-        this.hosts = hosts;
     }
 
     @Override
     public void run() {
         while (true) {
-            fairlossLink.receive(hosts);
+            fairlossLink.receive();
         }
     }
 }
