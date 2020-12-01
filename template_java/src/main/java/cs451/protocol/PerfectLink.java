@@ -38,13 +38,14 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
 
     public void send(Message m, String dstIp, int dstPort) {
         MessageWithId m1 = new MessageWithId(m, UUID.randomUUID());
+        System.out.println("sending message " + m.seq + " --" + m1.uuid);
         unAcked.put(m1, new AbstractMap.SimpleEntry<>(dstIp, dstPort));
         fairLossLink.send(m1, dstIp, dstPort);
     }
 
     @Override
     public void deliver(MessageWithId m, int srcId) {
-        System.out.println("receiving message " + m.message.seq + " from " + srcId);
+        System.out.println("receiving message " + m.message.seq + " from " + srcId + " -" + m.uuid);
         if (m.message.seq == -1) { //ack
             unAcked.remove(m);
         } else {
