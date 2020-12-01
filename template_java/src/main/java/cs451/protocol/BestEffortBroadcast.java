@@ -26,7 +26,6 @@ public class BestEffortBroadcast extends UnderlyingProtocol implements Listener{
 
     @Override
     public void deliver(MessageWithId m, int srcId) {
-        //listener.deliver(m, srcId); TODO
-        Main.outputBuffer.add("d " + m.message.senderId + " " + m.message.seq); //TODO
+        listener.deliver(m, srcId);
     }
 }

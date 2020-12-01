@@ -17,7 +17,7 @@ public class Host {
 
     private ReceiveThread receiveThread;
     private FifoBroadcast fb;
-    private BestEffortBroadcast beb; //TODO
+    private UniformReliableBroadcast urb; //TODO
 
     private int nbMessages;
 
@@ -54,8 +54,8 @@ public class Host {
     public void init(List<Host> hosts, int nbMessages) {
 	    FairLossLink fairlossLink = new FairLossLink(ip, port, hosts);
         PerfectLink perfectLink = new PerfectLink(fairlossLink, hosts);
-        beb = new BestEffortBroadcast(perfectLink, hosts); //TODO
-        //UniformReliableBroadcast urb = new UniformReliableBroadcast(beb, hosts.size());
+        BestEffortBroadcast beb = new BestEffortBroadcast(perfectLink, hosts);
+        urb = new UniformReliableBroadcast(beb, hosts.size()); //TODO
         //fb = new FifoBroadcast(urb, hosts.size());
 
         receiveThread = new ReceiveThread(fairlossLink);
@@ -91,7 +91,7 @@ public class Host {
         }*/
 
         for (int i =1 ; i<=nbMessages ; i++) {
-            beb.broadcast(new Message(i, id)); //TODO
+            urb.broadcast(new Message(i, id)); //TODO
             Main.outputBuffer.add("b " + i);
         }
     }
