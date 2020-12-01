@@ -39,11 +39,11 @@ public class FifoBroadcast implements Listener{
                     int n = next.get(p.senderId-1) + 1;
                     next.set(p.senderId-1, n);
                     toRemove = p;
-                    Main.outputBuffer.add("d " + m.message.senderId + " " + m.message.seq);
                 }
             }
             if (toRemove != null) {
                 pending.remove(toRemove);
+                Main.outputBuffer.add("d " + toRemove.senderId + " " + toRemove.seq);
             } else {
                 more = false;
             }
