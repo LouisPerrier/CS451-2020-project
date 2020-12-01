@@ -44,6 +44,7 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
 
     @Override
     public void deliver(MessageWithId m, int srcId) {
+        System.out.println("receiving message " + m.message.seq + " from " + srcId);
         if (m.message.seq == -1) { //ack
             unAcked.remove(m);
         } else {
@@ -57,8 +58,10 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
             }
             MessageWithId ack = new MessageWithId(new Message(-1, srcId), m.uuid);
             fairLossLink.send(ack, srcIp, srcPort);
+            System.out.println("sending ack");
 
             if (!delivered.contains(m)) {
+                System.out.println("delivering message");
                 delivered.add(m);
                 listener.deliver(m, srcId);
             }
