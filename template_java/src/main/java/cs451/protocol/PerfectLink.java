@@ -10,9 +10,9 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
 
     private FairLossLink fairLossLink;
     private List<Host> hosts;
-    private Timer timer;
+    //private Timer timer;
 
-    private Map<MessageWithId, AbstractMap.SimpleEntry<String, Integer>> unAcked;
+    private Set<MessageWithId> unAcked;
     private Set<MessageWithId> delivered;
 
     private final long period = 1000;
@@ -22,9 +22,9 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
         this.hosts = hosts;
         fairLossLink.addListener(this);
 
-        unAcked = new HashMap<>();
+        unAcked = new HashSet<>();
         delivered = new HashSet<>();
-        timer = new Timer();
+        /*timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -33,18 +33,21 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
                     fairLossLink.send(m, e.getKey(), e.getValue());
                 }
             }
-        }, 0, period);
+        }, 0, period);*/
     }
 
     public void send(Message m, String dstIp, int dstPort) {
         MessageWithId m1 = new MessageWithId(m, UUID.randomUUID());
-        unAcked.put(m1, new AbstractMap.SimpleEntry<>(dstIp, dstPort));
+        unAcked.add(m1);
         fairLossLink.send(m1, dstIp, dstPort);
     }
 
     @Override
     public void deliver(MessageWithId m, int srcId) {
-/*String srcIp = "";
+        if (m.message.seq == -1) { //ack
+            unAcked.remove(m);
+        } else {
+            String srcIp = "";
             int srcPort = 0;
             for (Host h : hosts) {
                 if (h.getId() == srcId) {
@@ -52,20 +55,13 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
                     srcPort = h.getPort();
                 }
             }
-        if (delivered.contains(m)) {
-            
-            fairLossLink.send(m, srcIp, srcPort); //send ack
-        } else if (unAcked.containsKey(m)) {
-            unAcked.remove(m);
-        } else {
-fairLossLink.send(m, srcIp, srcPort); //send ack
-            delivered.add(m);
-            listener.deliver(m, srcId);
-        }*/
+            MessageWithId ack = new MessageWithId(new Message(-1, srcId), m.uuid);
+            fairLossLink.send(ack, srcIp, srcPort);
 
-	if (!delivered.contains(m)) {
-		delivered.add(m);
-            listener.deliver(m, srcId);
-}
+            if (!delivered.contains(m)) {
+                delivered.add(m);
+                listener.deliver(m, srcId);
+            }
+        }
     }
 }
