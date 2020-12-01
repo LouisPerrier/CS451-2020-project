@@ -10,9 +10,9 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
 
     private FairLossLink fairLossLink;
     private List<Host> hosts;
-    //private Timer timer;
+    private Timer timer;
 
-    private Set<MessageWithId> unAcked;
+    private Map<MessageWithId, AbstractMap.SimpleEntry<String, Integer>> unAcked;
     private Set<MessageWithId> delivered;
 
     private final long period = 1000;
@@ -22,9 +22,9 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
         this.hosts = hosts;
         fairLossLink.addListener(this);
 
-        unAcked = new HashSet<>();
+        unAcked = new HashMap<>();
         delivered = new HashSet<>();
-        /*timer = new Timer();
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -33,12 +33,12 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
                     fairLossLink.send(m, e.getKey(), e.getValue());
                 }
             }
-        }, 0, period);*/
+        }, 0, period);
     }
 
     public void send(Message m, String dstIp, int dstPort) {
         MessageWithId m1 = new MessageWithId(m, UUID.randomUUID());
-        unAcked.add(m1);
+        unAcked.put(m1, new AbstractMap.SimpleEntry<>(dstIp, dstPort));
         fairLossLink.send(m1, dstIp, dstPort);
     }
 
