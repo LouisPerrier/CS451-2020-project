@@ -28,7 +28,7 @@ public class LocalizedCausalBroadcast implements Listener{
 
     public void broadcast(Message m) {
         for (Integer i : dependencies) {
-            m.vectorClock[i] = v[i];
+            m.vectorClock[i-1] = v[i-1];
         }
         m.vectorClock[hostId-1] = lsn;
         lsn++;
