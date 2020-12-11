@@ -53,6 +53,7 @@ public class LocalizedCausalBroadcast implements Listener{
                 if (smaller) {
                     toRemove = p;
                     v[p.senderId-1] = v[p.senderId-1] + 1;
+                    break;
                 }
             }
             if (toRemove != null) {
