@@ -14,7 +14,7 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
     private int nHosts;
     private Timer timer;
 
-    private Map<MessageWithId, AbstractMap.SimpleEntry<String, Integer>> unAcked;
+    private ConcurrentHashMap<MessageWithId, AbstractMap.SimpleEntry<String, Integer>> unAcked;
     private Set<MessageWithId> delivered;
 
     private final long period = 1000;
