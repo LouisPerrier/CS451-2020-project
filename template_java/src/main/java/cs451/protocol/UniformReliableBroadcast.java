@@ -37,10 +37,10 @@ public class UniformReliableBroadcast extends UnderlyingProtocol implements List
     public void deliver(MessageWithId m, int srcId) {
         Message message = m.message;
         if (!ack.containsKey(message)) {
-            ack.put(message, new HashSet<>(srcId));
-        } else {
-            ack.get(message).add(srcId);
+            ack.put(message, new HashSet<>());
         }
+        ack.get(message).add(srcId);
+
 
         if (!pending.contains(message)) {
             pending.add(message);

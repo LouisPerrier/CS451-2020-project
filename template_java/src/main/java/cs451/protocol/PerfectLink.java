@@ -33,7 +33,8 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
             public void run() {
                 for (MessageWithId m : unAcked.keySet()) {
                     AbstractMap.SimpleEntry<String, Integer> e = unAcked.get(m);
-                    fairLossLink.send(m, e.getKey(), e.getValue());
+                    if (e != null)
+                        fairLossLink.send(m, e.getKey(), e.getValue());
                 }
             }
         }, 0, period);
