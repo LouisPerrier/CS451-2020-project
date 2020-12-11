@@ -2,8 +2,7 @@ package cs451;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class Main {
 
@@ -66,12 +65,21 @@ public class Main {
         }
 
         int nbMessages = 0;
+        ArrayList<Set<Integer>> allDependencies = new ArrayList<>();
 
         if (parser.hasConfig()) {
             try {
                 BufferedReader reader = new BufferedReader(new FileReader(new File(parser.config())));
                 String s = reader.readLine();
                 nbMessages = Integer.parseInt(s);
+                while ((s= reader.readLine()) != null) {
+                    String[] processIds = s.split(" ");
+                    Set<Integer> processDependencies = new HashSet<>();
+                    for (String id : processIds) {
+                        processDependencies.add(Integer.parseInt(s));
+                    }
+                    allDependencies.add(processDependencies);
+                }
                 reader.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -79,7 +87,7 @@ public class Main {
         }
 
         if (myHost != null) {
-            myHost.init(parser.hosts(), nbMessages);
+            myHost.init(parser.hosts(), nbMessages, allDependencies);
         } else {
             System.out.println("Invalid id");
         }

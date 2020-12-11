@@ -3,10 +3,12 @@ package cs451;
 public class Message {
     public int seq;
     public int senderId;
+    public int[] vectorClock;
 
-    public Message(int seq, int senderId) {
+    public Message(int seq, int senderId, int[] vectorClock) {
         this.seq = seq;
         this.senderId = senderId;
+        this.vectorClock = vectorClock;
     }
 
     @Override

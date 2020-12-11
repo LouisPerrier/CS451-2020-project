@@ -4,7 +4,9 @@ import cs451.protocol.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 public class Host {
@@ -16,8 +18,10 @@ public class Host {
     private int port = -1;
 
     private ReceiveThread receiveThread;
-    private FifoBroadcast fb;
+    //private FifoBroadcast fb;
+    private LocalizedCausalBroadcast lcb;
 
+    private int nbHosts;
     private int nbMessages;
 
     public boolean populate(String idString, String ipString, String portString) {
@@ -50,12 +54,15 @@ public class Host {
         return true;
     }
 
-    public void init(List<Host> hosts, int nbMessages) {
+    public void init(List<Host> hosts, int nbMessages, ArrayList<Set<Integer>> dependencies) {
+        nbHosts = hosts.size();
+
 	    FairLossLink fairlossLink = new FairLossLink(ip, port, hosts);
         PerfectLink perfectLink = new PerfectLink(fairlossLink, hosts);
         BestEffortBroadcast beb = new BestEffortBroadcast(perfectLink, hosts);
-        UniformReliableBroadcast urb = new UniformReliableBroadcast(beb, hosts.size());
-        fb = new FifoBroadcast(urb, hosts.size());
+        UniformReliableBroadcast urb = new UniformReliableBroadcast(beb, nbHosts);
+        lcb = new LocalizedCausalBroadcast(urb, nbHosts, dependencies.get(id-1), id);
+        //fb = new FifoBroadcast(urb, hosts.size());
 
         receiveThread = new ReceiveThread(fairlossLink);
 
@@ -74,23 +81,12 @@ public class Host {
         return port;
     }
 
-    public void broadcast() throws InterruptedException {
+    public void broadcast() {
         receiveThread.start();
 
-        /*if (id == 1) {
-            perfectLink.send(new Message(1, id), "localhost", 11002);
-        }
-        else if (id == 2) {
-            perfectLink.send(new Message(1, id), "localhost", 11001);
-            perfectLink.send(new Message(2, id), "localhost", 11001);
-            perfectLink.send(new Message(3, id), "localhost", 11001);
-        }
-        else if (id == 3) {
-            perfectLink.send(new Message(1, id), "localhost", 11002);
-        }*/
-
         for (int i =1 ; i<=nbMessages ; i++) {
-            fb.broadcast(new Message(i, id));
+            //fb.broadcast(new Message(i, id));
+            lcb.broadcast(new Message(i, id, new int[nbHosts]));
             Main.outputBuffer.add("b " + i);
         }
     }

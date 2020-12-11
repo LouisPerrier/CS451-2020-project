@@ -15,6 +15,7 @@ public class FairLossLink extends UnderlyingProtocol {
 
     private DatagramSocket socket;
     private List<Host> hosts;
+    private int nHosts;
 
     public FairLossLink(String ip, int port, List<Host> hosts) {
         try {
@@ -23,15 +24,19 @@ public class FairLossLink extends UnderlyingProtocol {
             e.printStackTrace();
         }
         this.hosts = hosts;
+        nHosts = hosts.size();
     }
 
 
     public void send(MessageWithId m, String dstIp, int dstPort) {
 
-        ByteBuffer bb = ByteBuffer.allocate(24);
+        ByteBuffer bb = ByteBuffer.allocate(24+4*nHosts);
         bb.putInt(m.message.seq).putInt(m.message.senderId);
         bb.putLong(m.uuid.getMostSignificantBits());
         bb.putLong(m.uuid.getLeastSignificantBits());
+        for (int i = 0; i < nHosts; i++) {
+            bb.putInt(m.message.vectorClock[i]);
+        }
         byte[] buf = bb.array();
 
         try {
@@ -44,7 +49,7 @@ public class FairLossLink extends UnderlyingProtocol {
     }
 
     public void receive() {
-        byte[] buf = new byte[24];
+        byte[] buf = new byte[24+4*nHosts];
         DatagramPacket packet = new DatagramPacket(buf, buf.length);
         try {
             socket.receive(packet);
@@ -57,8 +62,12 @@ public class FairLossLink extends UnderlyingProtocol {
         int senderId = bb.getInt();
         long uuid1 = bb.getLong();
         long uuid2 = bb.getLong();
+        int[] vectorClock = new int[nHosts];
+        for (int i=0 ; i<nHosts ; i++){
+            vectorClock[i] = bb.getInt();
+        }
 
-        Message message = new Message(seq, senderId);
+        Message message = new Message(seq, senderId, vectorClock);
         MessageWithId m = new MessageWithId(message, new UUID(uuid1, uuid2));
 
         int sourceId = 0;
