@@ -76,7 +76,7 @@ public class Main {
                     String[] processIds = s.split(" ");
                     Set<Integer> processDependencies = new HashSet<>();
                     for (String id : processIds) {
-                        processDependencies.add(Integer.parseInt(s));
+                        processDependencies.add(Integer.parseInt(id));
                     }
                     allDependencies.add(processDependencies);
                 }
