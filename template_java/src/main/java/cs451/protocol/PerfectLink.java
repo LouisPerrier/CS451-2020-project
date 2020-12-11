@@ -5,6 +5,7 @@ import cs451.Message;
 import cs451.MessageWithId;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PerfectLink extends UnderlyingProtocol implements Listener {
 
@@ -24,14 +25,13 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
         this.nHosts = hosts.size();
         fairLossLink.addListener(this);
 
-        unAcked = new HashMap<>();
+        unAcked = new ConcurrentHashMap<>();
         delivered = new HashSet<>();
         timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                Set<MessageWithId> messages = new HashSet<>(unAcked.keySet());
-                for (MessageWithId m : messages) {
+                for (MessageWithId m : unAcked.keySet()) {
                     AbstractMap.SimpleEntry<String, Integer> e = unAcked.get(m);
                     fairLossLink.send(m, e.getKey(), e.getValue());
                 }
