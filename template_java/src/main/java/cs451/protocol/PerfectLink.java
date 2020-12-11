@@ -30,7 +30,8 @@ public class PerfectLink extends UnderlyingProtocol implements Listener {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (MessageWithId m : unAcked.keySet()) {
+                Set<MessageWithId> messages = new HashSet<>(unAcked.keySet());
+                for (MessageWithId m : messages) {
                     AbstractMap.SimpleEntry<String, Integer> e = unAcked.get(m);
                     fairLossLink.send(m, e.getKey(), e.getValue());
                 }
