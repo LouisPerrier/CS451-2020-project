@@ -17,10 +17,10 @@ from enum import Enum
 from collections import defaultdict, OrderedDict
 
 
-BARRIER_IP = '127.0.0.1'
+BARRIER_IP = 'localhost'
 BARRIER_PORT = 10000
 
-SIGNAL_IP = '127.0.0.1'
+SIGNAL_IP = 'localhost'
 SIGNAL_PORT = 11000
 
 PROCESSES_BASE_IP = 11000
@@ -202,91 +202,15 @@ class FifoBroadcastValidation(Validation):
         return True
 
 class LCausalBroadcastValidation(Validation):
-    def __init__(self, processes, messages, outputDir, causalities):
+    def __init__(self, processes, messages, outputDir, extraParameter):
         super().__init__(processes, messages, outputDir)
-        self.causalities = causalities
         # Use the `extraParameter` to pass any information you think is relevant
 
     def generateConfig(self):
-        hosts = tempfile.NamedTemporaryFile(mode='w')
-        config = tempfile.NamedTemporaryFile(mode='w')
-        for i in range(1,self.processes + 1):
-        	hosts.write("{} localhost {}\n".format(i, PROCESSES_BASE_IP+i))
-        hosts.flush()
-
-        to_write = ["{} {}".format(x," ".join(list(map(str, y)))) for (x,y) in self.causalities.items()]
-        config.write("{}\n{}".format(self.messages,"\n".join(to_write)))
-        print("{}\n{}".format(self.messages,"\n".join(to_write)))
-        config.flush()
-
-        return (hosts,config)
+        raise NotImplementedError()
 
     def checkProcess(self, pid):
-        filePath = os.path.join(self.outputDirPath, 'proc{:02d}.output'.format(pid))
-
-        filename = os.path.basename(filePath)
-        next_broadcast = 1
-        msg_order = dict()
-        nextMessage = defaultdict(lambda : 1)
-        with open(filePath) as f:
-
-            for lineNumber, line in enumerate(f):
-                tokens = line.split()
-                
-                # Check broadcast
-                if tokens[0] == 'b':
-                    msg = int(tokens[1])
-                    if msg != next_broadcast:
-                        print("File {}, Line {}: Messages broadcast out of order. Expected message {} but broadcast message {}".format(filename, lineNumber, i, msg))
-                        return False
-                    next_broadcast += 1
-
-                # Check delivery
-                if tokens[0] == 'd':
-                    sender = int(tokens[1])
-                    msg = int(tokens[2])
-                    if msg != nextMessage[sender]:
-                        print(msg)
-                        print(sender)
-                        print("File {}, Line {}: Message delivered out of order. Expected message {}, but delivered message {}".format(filename, lineNumber, nextMessage[sender], msg))
-                        return False
-                    else:
-                        nextMessage[sender] = msg + 1
-                        ###If process depends on the sender and still has something to broadcast we remember de dependency
-                        if sender in self.causalities[pid] and next_broadcast <= self.messages:
-                            msg_order[(sender,msg)] = (pid,next_broadcast)
-
-        return self.checkOtherProcessCausalities(pid,msg_order)
-    
-    def checkOtherProcessCausalities(self,pid,msg_order) :
-        other_processes = [n for n in list(range(1,self.processes + 1)) if n != pid]
-        for p in other_processes :
-
-            filePath = os.path.join(self.outputDirPath, 'proc{:02d}.output'.format(p))
-            filename = os.path.basename(filePath)
-            to_deliver = set()
-            all_delivered = set()
-         
-            with open(filePath) as f:
-                for lineNumber, line in enumerate(f):
-                    tokens = line.split()
-
-                    # Check delivery
-                    if tokens[0] == 'd':
-                        sender = int(tokens[1])
-                        msg = int(tokens[2])
-                        all_delivered.add((sender,msg))
-                        if (sender,msg) in to_deliver:
-                            to_deliver.remove((sender,msg))
-                        if (sender,msg) in msg_order:
-                            to_deliver.add(msg_order[(sender,msg)])
-                    if len(to_deliver) != 0 and to_deliver in all_delivered :
-                        print("File {} Message was delivered before it should have been. The concerned messages are {}".format(filename,str(to_deliver)))
-                        return False
-        return True
-                        
-
-
+        raise NotImplementedError()
 
 class StressTest:
     def __init__(self, procs, concurrency, attempts, attemptsRatio):
@@ -363,10 +287,8 @@ class StressTest:
     def continueStoppedProcesses(self):
         for _, info in self.processesInfo.items():
             with info.lock:
-                print(info.state)
                 if info.state != ProcessState.TERMINATED:
                     if info.state == ProcessState.STOPPED:
-                        print("Sending running signal")
                         info.handle.send_signal(ProcessInfo.stateToSignal(ProcessState.RUNNING))
 
     def run(self):
@@ -419,7 +341,7 @@ def startProcesses(processes, runscript, hostsFilePath, configFilePath, outputDi
 
 def main(processes, messages, runscript, broadcastType, logsDir, testConfig):
     # Set tc for loopback
-    tc = TC(testConfig['TC'], interface="lo", needSudo=True, sudoPassword="einstein")
+    tc = TC(testConfig['TC'])
     print(tc)
 
     # Start the barrier
@@ -431,7 +353,7 @@ def main(processes, messages, runscript, broadcastType, logsDir, testConfig):
     initBarrierThread.start()
 
     # Start the finish signal
-    finishSignal = finishedSignal.FinishedSignal(SIGNAL_IP, SIGNAL_PORT, processes,print)
+    finishSignal = finishedSignal.FinishedSignal(SIGNAL_IP, SIGNAL_PORT, processes)
     finishSignal.listen()
     finishSignalThread = threading.Thread(target=finishSignal.wait)
     finishSignalThread.start()
@@ -441,17 +363,7 @@ def main(processes, messages, runscript, broadcastType, logsDir, testConfig):
     else:
         # Use the last argument (now it's `None` since it's not being use) to
         # pass any information that you think is relevant
-        
-        causalities = dict()
-        process_list = list(range(1,processes + 1))
-        for i in process_list:
-            other_processes = [n for n in process_list if n != i]
-            print(other_processes)
-            n_elements = random.randint(0,len(other_processes))
-            causalities[i] = random.sample(other_processes,n_elements)
-
-
-        validation = LCausalBroadcastValidation(processes, messages, logsDir, causalities)
+        validation = LCausalBroadcastValidation(processes, messages, logsDir, None)
 
     hostsFile, configFile = validation.generateConfig()
 
